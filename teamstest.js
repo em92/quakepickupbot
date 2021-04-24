@@ -1,4 +1,5 @@
-module.exports = (players) => { 
+function teamstest() {
+    var players = [{username:"player1",rating:30.1},{username:"player2",rating:25.0},{username:"player3",rating:32.8},{username:"player4",rating:10.5},{username:"player5",rating:16.8},{username:"player6",rating:22.4},{username:"player7",rating:26.7},{username:"player8",rating:7.8},{username:"player9",rating:36.2},{username:"player10",rating:23.5}]
     // Calculate target team rating
     var targetTeamRating = 0;
     players.forEach(player => targetTeamRating += player.rating);
@@ -36,10 +37,23 @@ module.exports = (players) => {
         return JSON.parse(JSON.stringify(obj))
     }
 
+    var rT = ''
+    redTeam.forEach(plyr => {
+        rT += "`" + plyr.username + "`" + "(" + plyr.rating + ")" + "\n"
+    })
+    var bT = ''
+    blueTeam.forEach(plyr => {
+        bT += "`" + plyr.username + "`" + "(" + plyr.rating + ")" + "\n"
+    })
     const teams = {
-        redTeam: redTeam,
-        blueTeam: blueTeam
+        redTeam: rT,
+        redAvg: Math.round((redTeam.reduce((a,x) => a+x.rating,0)/5+ Number.EPSILON)*100)/100,
+        blueTeam: bT,
+        blueAvg: Math.round((blueTeam.reduce((a,x) => a+x.rating,0)/5+ Number.EPSILON)*100)/100
     }
 
     return teams
 }
+
+module.exports = teamstest
+

@@ -21,6 +21,7 @@ const client = new discordJS.Client()
 const fs = require('fs')
 const Command = require('./Command')
 const Game = require('./Game')
+const teamstest = require('./teamstest')
 
 client.commands = new discordJS.Collection()
 
@@ -38,7 +39,7 @@ client.on('ready', () => {
     console.log('Bot has started')
 })
 
-client.on('message', message => {
+client.on('message', async (message) => {
     if (message.author.bot || !message.content.toLowerCase().startsWith(prefix) || message.guild === null)
         return 
 
@@ -68,6 +69,25 @@ client.on('message', message => {
     else if (command === 'pull' && message.member.roles.cache.some( r=> ["Admins: Philosophers in Limbo"].includes(r.name)))
     {
         client.commands.get('pull').execute(message, args)
+    }
+    else if (command === 'test')
+    {
+        const teams = await teamstest()
+            console.log(teams)
+            const embed = new discordJS.MessageEmbed()
+            .setTitle('Auto Teams')
+            .addFields(
+            {
+                name: 'Red' + `(${teams.redAvg})` ,
+                value: `${teams.redTeam}`,
+                inline: true,
+            },
+            {
+                name: 'Blue' + `(${teams.blueAvg})` ,
+                value: `${teams.blueTeam}`,
+                inline: true,
+            })
+            message.channel.send(embed)
     }
     else if ((command === 'set' || command === 'delete' || command === 'update') && message.member.roles.cache.some( r=> ["Admins: Philosophers in Limbo"].includes(r.name)))
     {

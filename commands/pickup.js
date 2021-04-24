@@ -2,6 +2,7 @@ const discordJS = require('discord.js')
 const fetch = require('node-fetch')
 const Game = require('./../Game')
 const Player = require('./../Players')
+const teams = require('./../teams')
 
 async function get_rating(steamid, mode)
 {
@@ -61,41 +62,7 @@ module.exports = {
                                 teams += player.username  + ":" + "`" + player.rating + "`" + "\n"
                             })
 
-                            var targetTeamRating = 0;
-                            teams.forEach(player => targetTeamRating += player.rating);
-                            targetTeamRating = targetTeamRating/2;
 
-                            var allPossibleTeams = combination(teams, 5);
-
-                            allPossibleTeamRatings = allPossibleTeams.map(team => ({rating: Math.abs(targetTeamRating-team.reduce((teamRating, player) => teamRating + player.rating, 0)), teams: team}));
-                            allPossibleTeamRatings.sort((a, b) => a.rating-b.rating)
-
-                            candidateTeams = allPossibleTeamRatings.filter(team => Math.round((team.rating-allPossibleTeamRatings[0].rating + Number.EPSILON) * 100) / 100 <= 0.01)
-
-                            var redTeam = candidateTeams[Math.floor(Math.random()*candidateTeams.length)].teams;
-                            redTeam.sort((a, b) => b.rating-a.rating)
-                            var blueTeam = [...teams].filter(p1 => redTeam.findIndex(p2 => p1.username === p2.username) == -1)
-                            blueTeam.sort((a, b) => b.rating-a.rating)
-
-                            console.log(redTeam)
-                            console.log(redTeam.reduce((a,x) => a+x.rating,0))
-                            console.log(blueTeam)
-                            console.log(blueTeam.reduce((a,x) => a+x.rating,0))
-                            console.log(targetTeamRating)
-
-                            function combination(list, r) {
-                            function * combinationRepeat(prefix, list, size) {
-                                if (size)
-                                    for (var i = 0; i < list.length; i++)
-                                            yield * combinationRepeat(prefix.concat(list[i]), deepClone(list.slice(i)), size-1);
-                                else yield prefix;
-                            }
-                            return [...combinationRepeat([], deepClone(list), r)];
-                            }
-
-                            function deepClone(obj) {
-                                return JSON.parse(JSON.stringify(obj))
-                            }
                             const embed = new discordJS.MessageEmbed()
                             .setTitle('TDM Pickup game started')
                             .setDescription(redTeam + blueTeam)
@@ -128,16 +95,26 @@ module.exports = {
                     
                     connect_steamid(doc.players, 'ctf')
                     .then(teams1 => {
-                        var teams = ''
                         setTimeout(() => { 
-                            teams1.forEach(player => {
-                                teams += player.username  + ":" + "`" + player.rating + "`" + "\n"
+                            teams(teams1)
+                            .then(teams => {
+                                console.log(teams)
+                                const embed = new discordJS.MessageEmbed()
+                                .setTitle('TDM Pickup game started')
+                                .setFields(
+                                {
+                                    name: 'Red team' ,
+                                    value: `${teams.redTeam}`,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Blue team' ,
+                                    value: `${teams.blueTeam}`,
+                                    inline: true,
+                                })
+                                message.channel.send(embed)
                             })
-                            const embed = new discordJS.MessageEmbed()
-                            .setTitle('CTF Pickup game started')
-                            .setDescription(teams)
-                            message.channel.send(embed)
-                         }, 1000);
+                         }, 1500);
                     })
 
                     doc.players = undefined
@@ -159,7 +136,7 @@ module.exports = {
         {
             Game.findOneAndUpdate({ type: 'tdm' }, {$addToSet:{players: player }}, {new: true} )
             .then(async (doc) => {
-                if (doc.players.length === 8)
+                if (doc.players.length === 4)
                 {
                     var msg = 'TDM game has started. Players: '
                     doc.players.forEach((player1) => {
@@ -169,16 +146,26 @@ module.exports = {
                     
                     connect_steamid(doc.players, 'tdm')
                     .then(teams1 => {
-                        var teams = ''
                         setTimeout(() => { 
-                            teams1.forEach(player => {
-                                teams += player.username  + ":" + "`" + player.rating + "`" + "\n"
+                            teams(teams1)
+                            .then(teams => {
+                                console.log(teams)
+                                const embed = new discordJS.MessageEmbed()
+                                .setTitle('TDM Pickup game started')
+                                .setFields(
+                                {
+                                    name: 'Red team' ,
+                                    value: `${teams.redTeam}`,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Blue team' ,
+                                    value: `${teams.blueTeam}`,
+                                    inline: true,
+                                })
+                                message.channel.send(embed)
                             })
-                            const embed = new discordJS.MessageEmbed()
-                            .setTitle('TDM Pickup game started')
-                            .setDescription(teams)
-                            message.channel.send(embed)
-                         }, 1000);
+                         }, 1500);
                     })
 
                     doc.players = undefined
@@ -209,16 +196,26 @@ module.exports = {
                     
                     connect_steamid(doc.players, 'ctf')
                     .then(teams1 => {
-                        var teams = ''
                         setTimeout(() => { 
-                            teams1.forEach(player => {
-                                teams += player.username  + ":" + "`" + player.rating + "`" + "\n"
+                            teams(teams1)
+                            .then(teams => {
+                                console.log(teams)
+                                const embed = new discordJS.MessageEmbed()
+                                .setTitle('TDM Pickup game started')
+                                .setFields(
+                                {
+                                    name: 'Red team' ,
+                                    value: `${teams.redTeam}`,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Blue team' ,
+                                    value: `${teams.blueTeam}`,
+                                    inline: true,
+                                })
+                                message.channel.send(embed)
                             })
-                            const embed = new discordJS.MessageEmbed()
-                            .setTitle('CTF Pickup game started')
-                            .setDescription(teams)
-                            message.channel.send(embed)
-                         }, 1000);
+                         }, 1500);
                     })
 
                     doc.players = undefined
